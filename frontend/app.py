@@ -78,13 +78,21 @@ with st.sidebar:
     st.title("📂 Documents")
     st.divider()
 
+    st.caption("⚠️ Free tier: keep files under 5 MB for best results.")
+
     uploaded_file = st.file_uploader(
         "Upload PDF or TXT",
         type=["pdf", "txt"],
         label_visibility="collapsed",
     )
 
-    if st.button("⬆ Upload", use_container_width=True, disabled=uploaded_file is None):
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+    file_too_large = uploaded_file is not None and uploaded_file.size > MAX_FILE_SIZE
+
+    if file_too_large:
+        st.warning(f"File is {uploaded_file.size / 1024 / 1024:.1f} MB. Please upload a file under 5 MB.")
+
+    if st.button("⬆ Upload", use_container_width=True, disabled=uploaded_file is None or file_too_large):
         with st.spinner("Uploading and indexing…"):
             result = api_upload(uploaded_file.read(), uploaded_file.name)
         if result:

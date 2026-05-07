@@ -8,12 +8,15 @@ def extract_text(file_bytes: bytes, filename: str) -> str:
 
     if ext == "pdf":
         import io
+        import gc
         text_parts = []
         with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
             for page in pdf.pages:
                 page_text = page.extract_text()
                 if page_text:
                     text_parts.append(page_text)
+                page.flush_cache()  # free page memory immediately
+            gc.collect()
         return "\n\n".join(text_parts)
 
     elif ext == "txt":

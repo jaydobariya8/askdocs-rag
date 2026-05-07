@@ -17,11 +17,12 @@ A sample document is included in this repo to test the live demo instantly.
 
 **Steps:**
 1. Open [askdocs-rag.streamlit.app](https://askdocs-rag.streamlit.app)
-2. In the sidebar, upload **`Rules of Golf for 2019 (Final).pdf`** (included in this repo)
+2. In the sidebar, upload **`Rules of Golf for 2019 (Final)-7-17.pdf`** (included in this repo — covers Rules 1–3)
 3. Ask questions like:
-   - *"What are the rules for a penalty stroke?"*
-   - *"How many clubs are allowed in a bag?"*
-   - *"What happens if a ball lands in a water hazard?"*
+   - *"What is the purpose of Rule 1?"*
+   - *"What are the five defined areas of the course?"*
+   - *"What is the difference between match play and stroke play?"*
+   - *"What happens if a player declares a wrong handicap?"*
 4. Try an out-of-scope question like *"Who won the FIFA World Cup?"* — the bot will say it doesn't know
 
 > The chatbot answers **only** from the uploaded document. No hallucination.
@@ -158,7 +159,7 @@ rag-document-chatbot/
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
-├── Rules of Golf for 2019 (Final).pdf  # Sample doc for live demo
+├── Rules of Golf for 2019 (Final)-7-17.pdf  # Sample doc (Rules 1–3, 11 pages)
 └── .streamlit/
     └── config.toml
 ```

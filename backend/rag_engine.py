@@ -33,18 +33,22 @@ class RAGEngine:
         return [vec.tolist() for vec in self._embed_model.embed(texts)]
 
     def add_document(self, doc_id: str, filename: str, chunks: list[str]) -> dict:
-        embeddings = self._embed(chunks)
-        ids = [f"{doc_id}_chunk_{i}" for i in range(len(chunks))]
-        metadatas = [
-            {"doc_id": doc_id, "filename": filename, "chunk_index": i}
-            for i in range(len(chunks))
-        ]
-        self._collection.add(
-            ids=ids,
-            embeddings=embeddings,
-            documents=chunks,
-            metadatas=metadatas,
-        )
+        # Process in batches of 50 to avoid OOM on large PDFs
+        batch_size = 50
+        for batch_start in range(0, len(chunks), batch_size):
+            batch = chunks[batch_start : batch_start + batch_size]
+            embeddings = self._embed(batch)
+            ids = [f"{doc_id}_chunk_{batch_start + i}" for i in range(len(batch))]
+            metadatas = [
+                {"doc_id": doc_id, "filename": filename, "chunk_index": batch_start + i}
+                for i in range(len(batch))
+            ]
+            self._collection.add(
+                ids=ids,
+                embeddings=embeddings,
+                documents=batch,
+                metadatas=metadatas,
+            )
         return {"doc_id": doc_id, "filename": filename, "num_chunks": len(chunks)}
 
     def query(self, question: str) -> dict:
