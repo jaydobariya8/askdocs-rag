@@ -7,7 +7,7 @@
 
 An intelligent chatbot that answers questions strictly from your uploaded documents using RAG (Retrieval Augmented Generation).
 
-> **Live Demo:** [Deploy on Streamlit Cloud](#deployment)
+> **Live Demo:** [askdocs-rag.streamlit.app](https://askdocs-rag.streamlit.app)
 
 
 ---
