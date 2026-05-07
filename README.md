@@ -9,11 +9,6 @@ An intelligent chatbot that answers questions strictly from your uploaded docume
 
 > **Live Demo:** [Deploy on Streamlit Cloud](#deployment)
 
----
-
-## Screenshot
-
-![Demo](screenshots/demo.png)
 
 ---
 
@@ -71,7 +66,11 @@ graph TD
 git clone https://github.com/YOUR_USERNAME/rag-document-chatbot.git
 cd rag-document-chatbot
 
-# Install
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
 
 # Configure
