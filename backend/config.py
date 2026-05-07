@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     top_k: int = 5
     relevance_threshold: float = 0.35
 
-    # Storage
-    chroma_persist_dir: str = "./chroma_db"
+    # Storage — use /tmp on cloud (always writable), local fallback
+    chroma_persist_dir: str = "/tmp/chroma_db"
 
     class Config:
         env_file = ".env"
