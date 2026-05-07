@@ -6,21 +6,32 @@ from __future__ import annotations
 
 import threading
 import time
+import socket
 import uvicorn
 from backend.main import app as fastapi_app
 
 BACKEND_URL = "http://localhost:8000"
+_backend_started = False
+
+
+def _port_in_use(port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(("localhost", port)) == 0
 
 
 def _run_backend():
     uvicorn.run(fastapi_app, host="0.0.0.0", port=8000, log_level="error")
 
 
-_thread = threading.Thread(target=_run_backend, daemon=True)
-_thread.start()
-
-# Brief pause so the backend binds before Streamlit sends requests
-time.sleep(2)
+# Only start backend thread if port not already bound
+if not _port_in_use(8000):
+    _thread = threading.Thread(target=_run_backend, daemon=True)
+    _thread.start()
+    # Wait until port is actually ready
+    for _ in range(20):
+        if _port_in_use(8000):
+            break
+        time.sleep(0.5)
 
 # ── Everything below is the Streamlit UI ─────────────────────────────────────
 import streamlit as st

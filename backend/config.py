@@ -1,9 +1,24 @@
+import os
 from pydantic_settings import BaseSettings
 from pydantic import Field
 
 
+def _get_groq_key() -> str:
+    # Try env var first (local .env or Streamlit Cloud secrets injected as env)
+    key = os.environ.get("GROQ_API_KEY", "")
+    if key:
+        return key
+    # Fallback: read directly from Streamlit secrets (when running on Cloud)
+    try:
+        import streamlit as st
+        return st.secrets["GROQ_API_KEY"]
+    except Exception:
+        pass
+    return ""
+
+
 class Settings(BaseSettings):
-    groq_api_key: str = Field(..., env="GROQ_API_KEY")
+    groq_api_key: str = Field(default_factory=_get_groq_key)
 
     # Model config
     groq_model: str = "llama-3.1-8b-instant"
