@@ -7,11 +7,11 @@ from __future__ import annotations
 import threading
 import time
 import socket
+import traceback
 import uvicorn
-from backend.main import app as fastapi_app
 
 BACKEND_URL = "http://localhost:8000"
-_backend_started = False
+_backend_error: str = ""
 
 
 def _port_in_use(port: int) -> bool:
@@ -20,15 +20,20 @@ def _port_in_use(port: int) -> bool:
 
 
 def _run_backend():
-    uvicorn.run(fastapi_app, host="0.0.0.0", port=8000, log_level="error")
+    global _backend_error
+    try:
+        from backend.main import app as fastapi_app
+        uvicorn.run(fastapi_app, host="0.0.0.0", port=8000, log_level="info")
+    except Exception:
+        _backend_error = traceback.format_exc()
 
 
 # Only start backend thread if port not already bound
 if not _port_in_use(8000):
     _thread = threading.Thread(target=_run_backend, daemon=True)
     _thread.start()
-    # Wait until port is actually ready
-    for _ in range(20):
+    # Wait until port is ready (max 15s)
+    for _ in range(30):
         if _port_in_use(8000):
             break
         time.sleep(0.5)
@@ -97,6 +102,11 @@ st.set_page_config(
     page_icon="📄",
     layout="wide",
 )
+
+if _backend_error:
+    st.error("Backend failed to start. Error details:")
+    st.code(_backend_error)
+    st.stop()
 
 if "messages" not in st.session_state:
     st.session_state.messages = []

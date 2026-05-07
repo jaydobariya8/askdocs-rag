@@ -16,9 +16,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-rag = RAGEngine()
+# Lazy-init: don't crash at import time, init on first request
+_rag: RAGEngine | None = None
 
 ALLOWED_EXTENSIONS = {"pdf", "txt"}
+
+
+def get_rag() -> RAGEngine:
+    global _rag
+    if _rag is None:
+        _rag = RAGEngine()
+    return _rag
 
 
 class QueryRequest(BaseModel):
@@ -60,7 +68,7 @@ async def upload_document(file: UploadFile = File(...)):
     doc_id = str(uuid.uuid4())
 
     try:
-        result = rag.add_document(doc_id=doc_id, filename=file.filename, chunks=chunks)
+        result = get_rag().add_document(doc_id=doc_id, filename=file.filename, chunks=chunks)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to index document: {e}")
 
@@ -78,7 +86,7 @@ def query_documents(request: QueryRequest):
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
 
     try:
-        result = rag.query(request.question)
+        result = get_rag().query(request.question)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Query failed: {e}")
 
@@ -88,7 +96,7 @@ def query_documents(request: QueryRequest):
 @app.get("/documents")
 def list_documents():
     try:
-        docs = rag.list_documents()
+        docs = get_rag().list_documents()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to list documents: {e}")
     return docs
@@ -97,7 +105,7 @@ def list_documents():
 @app.delete("/documents/{doc_id}")
 def delete_document(doc_id: str):
     try:
-        deleted = rag.delete_document(doc_id)
+        deleted = get_rag().delete_document(doc_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Deletion failed: {e}")
 
