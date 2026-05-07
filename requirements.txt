@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+python-multipart
+pdfplumber
+langchain-text-splitters
+chromadb
+fastembed
+groq
+streamlit
+requests
+pydantic-settings
+python-dotenv
